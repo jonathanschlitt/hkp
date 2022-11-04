@@ -2,7 +2,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-//import java.util.Arrays;
+import java.util.Arrays;
 import java.util.Properties;
 import java.util.Scanner;
 
@@ -83,20 +83,32 @@ public class Bordcomputer {
 		System.out.println("\nList of installed devices:\n");
 
 		for (int i = 0; i < deviceName.length; i++) {
-			System.out.println("=> " + deviceName[i]);
+			if (!deviceName[i].equals("")) {
+				System.out.println("=> " + deviceName[i]);
+			}
+
 		}
+
+		System.out.println(Arrays.toString(deviceName));
 
 	}
 
 	private void setDevices() throws ClassNotFoundException, Exception {
 
+		// System.out.println(Arrays.toString(deviceName));
+
 		try {
 			for (int i = 0; i < this.deviceName.length; i++) {
-				Constructor<?> constructor = Class.forName(this.deviceName[i]).getConstructor();
+				if (!this.deviceName[i].equals("")) {
+					Constructor<?> constructor = Class.forName(this.deviceName[i]).getConstructor();
 
-				// System.out.println(Arrays.toString(constructor.getParameterTypes()));
+					// System.out.println(Arrays.toString(constructor.getParameterTypes()));
 
-				this.installedDevices[i] = (Device) constructor.newInstance();
+					this.installedDevices[i] = (Device) constructor.newInstance();
+				} else {
+					this.installedDevices[i] = null;
+				}
+
 			}
 		} catch (Exception e) {
 			System.out.println(e);
@@ -120,11 +132,11 @@ public class Bordcomputer {
 		String input = "";
 
 		System.out.println(
-				"\nPlease choose a device of the list above. (enter number of option || enter random for a random choice)");
+				"\nPlease choose a device of the list above. (enter number of option || enter random for a random choice)\n");
 
 		input = sc.next();
 
-		System.out.println(input);
+		// System.out.println(input);
 
 		if (input.equalsIgnoreCase("random")) {
 			this.playingDevice = this.installedDevices[num];
