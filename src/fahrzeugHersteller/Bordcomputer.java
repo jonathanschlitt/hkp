@@ -1,14 +1,16 @@
 package fahrzeugHersteller;
 
+import java.lang.reflect.Method;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import zuliefererInterface.Device;
 
-public class Boardcomputer {
+public class Bordcomputer {
 
     private static final List<String> SUPPORTED_DEVICE_TYPES = Arrays.asList(new String[] {
             "Radio",
@@ -16,14 +18,16 @@ public class Boardcomputer {
             "USB"
     });
     private static final int MAX_DEVICES = 3;
-    private static final String CONFIG_FILENAME = "./Geraete.config";
+
+    // path needs to be changed to the path of the config file
+    private static final String CONFIG_FILENAME = "/Users/jonathanschlitt/hkp/src/fahrzeugHersteller/Geraete.config";
 
     private String[] deviceName;
     private Device[] device;
 
     private int currentDevice;
 
-    public Boardcomputer() {
+    public Bordcomputer() {
         this.readConfig();
         this.setDevices();
     }
@@ -97,11 +101,11 @@ public class Boardcomputer {
                 // Get class object
                 final Class<?> clazz = Class.forName(this.deviceName[i]);
                 // Create instance
-                final Object obj = clazz.getDeclaredConstructor(null).newInstance(null);
+                final Object obj = clazz.getDeclaredConstructor().newInstance();
                 // Check if instance is of type Device
-                if (obj instanceof Device) {
+                if (obj instanceof zuliefererInterface.Device) {
                     // Add instance to device array
-                    this.device[i] = (Device) obj;
+                    this.device[i] = (zuliefererInterface.Device) obj;
                 } else {
                     System.err.println("Class " + this.deviceName[i] + " is not of type Device.");
                 }
@@ -143,7 +147,12 @@ public class Boardcomputer {
         // If current device is null, call changeDevice() again
         if (this.device[this.currentDevice] == null && this.currentDevice < (this.device.length - 1)) {
             changeDevice();
+            System.out.println("\nChanged to device " + getCurrentDevice().getClass().getSimpleName() + "\n");
         }
+
+        System.out.println("\nChanged to device: " + getCurrentDevice().getClass().getSimpleName() + "\n");
+
+        showOptions();
     }
 
     private Device getCurrentDevice() {
@@ -167,38 +176,94 @@ public class Boardcomputer {
             return;
         }
 
+        System.out.println("\nInstalled devices: \n");
+        for (int i = 0; i < this.device.length; i++) {
+            if (this.device[i] != null) {
+                System.out.println("=> " + this.device[i].getClass().getSimpleName());
+            }
+        }
+
+        System.out.println("\nAll Bordcomputer options:\n");
+
+        for (int i = 0; i < getBordcomputerOptions().length; i++) {
+            System.out.println(10 + i + ": " + getBordcomputerOptions()[i]);
+        }
+
+        System.out.println("\nAll options from current " + device.getClass().getSimpleName() + " - Device:\n");
+
         // Print options
         for (int i = 0; i < device.getOptions().length; i++) {
             System.out.println(i + ": " + device.getOptions()[i]);
         }
+
+        System.out.println("\n");
     }
 
     public void enterOption(final int choice) {
+        // System.out.println("You entered: " + choice);
         // Get current device
         final Device device = getCurrentDevice();
 
-        // If device is null, return
-        if (device == null) {
-            System.err.println("No device found.");
-            return;
+        if (choice >= 10) {
+
+            final String[] bordcomputerOptions = getBordcomputerOptions();
+            String opt = getBordcomputerOptions()[choice - 10];
+
+            // System.out.println("You entered: " + opt);
+
+            // Check if choosen option is contained in extra options
+
+            boolean found = false;
+
+            for (final String bcOption : bordcomputerOptions) {
+                if (bcOption.equals(opt)) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                return;
+            }
+
+            // Otherwise invoke the method
+            try {
+
+                if (opt.equals("louder") || opt.equals("quieter")) {
+                    final Method method = Bordcomputer.class.getMethod(opt, Integer.TYPE);
+                    method.invoke(this, 1);
+                } else {
+                    final Method method = Bordcomputer.class.getMethod(opt);
+                    method.invoke(this);
+                }
+            } catch (final Exception e) {
+                System.err.println("Error while invoking method '" + opt + "': " + e.getMessage());
+            }
+        } else {
+            // If device is null, return
+            if (device == null) {
+                System.err.println("No device found.");
+                return;
+            }
+
+            // If choice is invalid, return
+            if (choice < 0) {
+                System.err.println("Invalid choice number.");
+                return;
+            }
+
+            // Get option
+            final String option = device.getOptions()[choice];
+
+            // If option is null, return
+            if (option == null) {
+                System.err.println("Invalid choice.");
+                return;
+            }
+
+            device.chooseOption(option);
         }
 
-        // If choice is invalid, return
-        if (choice < 0 || choice >= device.getOptions().length) {
-            System.err.println("Invalid choice number.");
-            return;
-        }
-
-        // Get option
-        final String option = device.getOptions()[choice];
-
-        // If option is null, return
-        if (option == null) {
-            System.err.println("Invalid choice.");
-            return;
-        }
-
-        device.chooseOption(option);
     }
 
     public void louder(final int p) {
@@ -285,6 +350,20 @@ public class Boardcomputer {
         }
 
         System.out.println(device.play());
+    }
+
+    public String[] getBordcomputerOptions() {
+        ArrayList<String> options = new ArrayList<String>();
+
+        for (Method method : Bordcomputer.class.getDeclaredMethods()) {
+            options.add(method.getName());
+        }
+
+        options.remove("readConfig");
+        options.remove("setDevices");
+        options.remove("getCurrentDevice");
+
+        return options.toArray(new String[options.size()]);
     }
 
 }
