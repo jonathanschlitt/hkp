@@ -23,9 +23,10 @@ public class Bordcomputer {
     private static final String CONFIG_FILENAME = "/Users/jonathanschlitt/hkp/src/fahrzeugHersteller/Geraete.config";
 
     private String[] deviceName;
-    private Device[] device;
+    private Device[] installedDevices;
+    private Device playingDevice;
 
-    private int currentDevice;
+    // private int playingDevice;
 
     public Bordcomputer() {
         this.readConfig();
@@ -84,10 +85,10 @@ public class Bordcomputer {
 
     private void setDevices() {
         // Reset device array
-        this.device = new Device[MAX_DEVICES];
+        this.installedDevices = new Device[MAX_DEVICES];
 
         // Reset current device
-        this.currentDevice = -1;
+        this.playingDevice = installedDevices[0];
 
         // Iterate over deviceName array
         for (int i = 0; i < this.deviceName.length; i++) {
@@ -105,7 +106,7 @@ public class Bordcomputer {
                 // Check if instance is of type Device
                 if (obj instanceof zuliefererInterface.Device) {
                     // Add instance to device array
-                    this.device[i] = (zuliefererInterface.Device) obj;
+                    this.installedDevices[i] = (zuliefererInterface.Device) obj;
                 } else {
                     System.err.println("Class " + this.deviceName[i] + " is not of type Device.");
                 }
@@ -130,45 +131,43 @@ public class Bordcomputer {
     }
 
     public void changeDevice() {
+        // get current device index
+        int currentIndex = 0;
+
+        for (int i = 0; i < this.installedDevices.length; i++) {
+            if (this.installedDevices[i].equals(this.playingDevice)) {
+                currentIndex = i;
+            }
+        }
+
         // If device array is null, return
-        if (this.device == null || this.device.length == 0) {
+        if (this.installedDevices == null || this.installedDevices.length == 0) {
             System.err.println("No devices available.");
             return;
         }
 
         // If current device is the last device, set current device to first device
-        if (this.currentDevice == (this.device.length - 1)) {
-            this.currentDevice = 0;
+        if (currentIndex == (this.installedDevices.length - 1)) {
+            this.playingDevice = installedDevices[0];
         } else {
             // Increment current device
-            this.currentDevice++;
+            this.playingDevice = installedDevices[currentIndex + 1];
         }
 
         // If current device is null, call changeDevice() again
-        if (this.device[this.currentDevice] == null && this.currentDevice < (this.device.length - 1)) {
+        if (this.playingDevice == null && currentIndex < (this.installedDevices.length - 1)) {
             changeDevice();
-            System.out.println("\nChanged to device " + getCurrentDevice().getClass().getSimpleName() + "\n");
+            System.out.println("\nChanged to device " + this.playingDevice.getClass().getSimpleName() + "\n");
         }
 
-        System.out.println("\nChanged to device: " + getCurrentDevice().getClass().getSimpleName() + "\n");
+        System.out.println("\nChanged to device: " + this.playingDevice.getClass().getSimpleName() + "\n");
 
         showOptions();
     }
 
-    private Device getCurrentDevice() {
-        // If device array is null, return null
-        if (this.currentDevice == -1 || this.device == null) {
-            System.err.println("No devices available.");
-            return null;
-        }
-
-        // Return current device
-        return this.device[this.currentDevice];
-    }
-
     public void showOptions() {
         // Get current device
-        final Device device = getCurrentDevice();
+        final Device device = this.playingDevice;
 
         // If device is null, return
         if (device == null) {
@@ -177,9 +176,9 @@ public class Bordcomputer {
         }
 
         System.out.println("\nInstalled devices: \n");
-        for (int i = 0; i < this.device.length; i++) {
-            if (this.device[i] != null) {
-                System.out.println("=> " + this.device[i].getClass().getSimpleName());
+        for (int i = 0; i < this.installedDevices.length; i++) {
+            if (this.installedDevices[i] != null) {
+                System.out.println("=> " + this.installedDevices[i].getClass().getSimpleName());
             }
         }
 
@@ -202,7 +201,7 @@ public class Bordcomputer {
     public void enterOption(final int choice) {
         // System.out.println("You entered: " + choice);
         // Get current device
-        final Device device = getCurrentDevice();
+        final Device device = this.playingDevice;
 
         if (choice >= 10) {
 
@@ -268,7 +267,7 @@ public class Bordcomputer {
 
     public void louder(final int p) {
         // Get current device
-        final Device device = getCurrentDevice();
+        final Device device = this.playingDevice;
 
         // If device is null, return
         if (device == null) {
@@ -285,7 +284,7 @@ public class Bordcomputer {
 
     public void quieter(final int p) {
         // Get current device
-        final Device device = getCurrentDevice();
+        final Device device = this.playingDevice;
 
         // If device is null, return
         if (device == null) {
@@ -302,7 +301,7 @@ public class Bordcomputer {
 
     public void showVolume() {
         // Get current device
-        final Device device = getCurrentDevice();
+        final Device device = this.playingDevice;
 
         // If device is null, return
         if (device == null) {
@@ -315,7 +314,7 @@ public class Bordcomputer {
 
     public void next() {
         // Get current device
-        final Device device = getCurrentDevice();
+        final Device device = this.playingDevice;
 
         // If device is null, return
         if (device == null) {
@@ -328,7 +327,7 @@ public class Bordcomputer {
 
     public void prev() {
         // Get current device
-        final Device device = getCurrentDevice();
+        final Device device = this.playingDevice;
 
         // If device is null, return
         if (device == null) {
@@ -341,7 +340,7 @@ public class Bordcomputer {
 
     public void play() {
         // Get current device
-        final Device device = getCurrentDevice();
+        final Device device = this.playingDevice;
 
         // If device is null, return
         if (device == null) {
