@@ -1,6 +1,7 @@
 package fahrzeugHersteller;
 
 import java.lang.reflect.Method;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -20,7 +21,7 @@ public class Bordcomputer {
     private static final int MAX_DEVICES = 3;
 
     // path needs to be changed to the path of the config file
-    private static final String CONFIG_FILENAME = "/Users/jonathanschlitt/hkp/src/fahrzeugHersteller/Geraete.config";
+    private static final String CONFIG_FILENAME = "/fahrzeugHersteller/Geraete.config";
 
     private String[] deviceName;
     private Device[] installedDevices;
@@ -41,9 +42,11 @@ public class Bordcomputer {
         try {
             // Reset line counter
             int lineCtr = 0;
+            
+            final File configFile = new File(getClass().getResource(CONFIG_FILENAME).getFile());
 
             // Read file line by line
-            for (final String line : Files.readAllLines(Paths.get(CONFIG_FILENAME))) {
+            for (final String line : Files.readAllLines(configFile.toPath())) {
                 // If line counter exceeds size of deviceName array, break
                 if (lineCtr >= MAX_DEVICES) {
                     System.err.println("Config file contains more than " + MAX_DEVICES + " lines. Ignoring the rest.");
@@ -168,12 +171,16 @@ public class Bordcomputer {
     public void showOptions() {
         // Get current device
         final Device device = this.playingDevice;
-
+        
+        
         // If device is null, return
         if (device == null) {
             System.err.println("No device found.");
             return;
         }
+        
+        final String[] boardComputerOptions = this.getBordcomputerOptions();
+        final String[] deviceOptions = device.getOptions();
 
         System.out.println("\nInstalled devices: \n");
         for (int i = 0; i < this.installedDevices.length; i++) {
@@ -184,33 +191,33 @@ public class Bordcomputer {
 
         System.out.println("\nAll Bordcomputer options:\n");
 
-        for (int i = 0; i < getBordcomputerOptions().length; i++) {
-            System.out.println(10 + i + ": " + getBordcomputerOptions()[i]);
+        for (int i = 0; i < boardComputerOptions.length; i++) {
+            System.out.println(deviceOptions.length + i + ": " + boardComputerOptions[i]);
         }
 
         System.out.println("\nAll options from current " + device.getClass().getSimpleName() + " - Device:\n");
 
         // Print options
-        for (int i = 0; i < device.getOptions().length; i++) {
-            System.out.println(i + ": " + device.getOptions()[i]);
+        for (int i = 0; i < deviceOptions.length; i++) {
+            System.out.println(i + ": " + deviceOptions[i]);
         }
 
         System.out.println("\n");
     }
 
     public void enterOption(final int choice) {
-        // System.out.println("You entered: " + choice);
-        // Get current device
         final Device device = this.playingDevice;
 
-        if (choice >= 10) {
-
-            final String[] bordcomputerOptions = getBordcomputerOptions();
-            String opt = getBordcomputerOptions()[choice - 10];
-
-            // System.out.println("You entered: " + opt);
-
-            // Check if choosen option is contained in extra options
+        final String[] bordcomputerOptions = getBordcomputerOptions();
+    	final String[] deviceOptions = device != null ? device.getOptions() : null;
+    	final int deviceOptionsLength = deviceOptions != null ? deviceOptions.length : 0;
+        
+        if (choice < 0) {
+        	System.err.println("Invalid option.");
+        	return;
+        } else if (choice >= deviceOptionsLength) {
+        	
+            final String opt = bordcomputerOptions[choice - deviceOptionsLength];
 
             boolean found = false;
 
@@ -240,19 +247,13 @@ public class Bordcomputer {
             }
         } else {
             // If device is null, return
-            if (device == null) {
-                System.err.println("No device found.");
-                return;
-            }
-
-            // If choice is invalid, return
-            if (choice < 0) {
-                System.err.println("Invalid choice number.");
+            if (deviceOptionsLength == 0) {
+                System.err.println("No device options found.");
                 return;
             }
 
             // Get option
-            final String option = device.getOptions()[choice];
+            final String option = deviceOptions[choice];
 
             // If option is null, return
             if (option == null) {
