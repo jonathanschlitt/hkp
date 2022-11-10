@@ -26,12 +26,17 @@ public class Bordcomputer {
 
     // private int playingDevice;
 
-    public Bordcomputer() {
-        this.readConfig();
-        this.setDevices();
+    public Bordcomputer(DeviceFactory... factorys) {
+        //this.readConfig();
+        //this.setDevices();
+        installedDevices = new Device[factorys.length];
+        for (int i = 0; i < factorys.length; i++) {
+            installedDevices[i] = factorys[i].createDevice();
+        }
+        changeDevice();
     }
 
-    private void readConfig() {
+    /*private void readConfig() {
         // Reset deviceName array
         this.deviceName = new String[MAX_DEVICES];
 
@@ -125,6 +130,7 @@ public class Bordcomputer {
 
         this.changeDevice();
     }
+    */
 
     public void shutdown() {
         System.out.println("Shutting down...");
