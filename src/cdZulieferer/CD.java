@@ -2,7 +2,7 @@ package cdZulieferer;
 
 import java.lang.reflect.*;
 
-import zuliefererInterface.Device;
+import fahrzeugHersteller.Device;
 
 public class CD implements Device {
   private int volume;

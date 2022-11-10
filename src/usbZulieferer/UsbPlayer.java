@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import zuliefererInterface.Device;
+import fahrzeugHersteller.Device;
 
 public class UsbPlayer implements Device {
 

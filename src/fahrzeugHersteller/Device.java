@@ -1,4 +1,4 @@
-package zuliefererInterface;
+package fahrzeugHersteller;
 
 public interface Device {
 

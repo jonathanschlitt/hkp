@@ -4,12 +4,9 @@ import java.lang.reflect.Method;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import zuliefererInterface.Device;
 
 public class Bordcomputer {
 
@@ -107,9 +104,9 @@ public class Bordcomputer {
                 // Create instance
                 final Object obj = clazz.getDeclaredConstructor().newInstance();
                 // Check if instance is of type Device
-                if (obj instanceof zuliefererInterface.Device) {
+                if (obj instanceof Device) {
                     // Add instance to device array
-                    this.installedDevices[i] = (zuliefererInterface.Device) obj;
+                    this.installedDevices[i] = (Device) obj;
                 } else {
                     System.err.println("Class " + this.deviceName[i] + " is not of type Device.");
                 }
