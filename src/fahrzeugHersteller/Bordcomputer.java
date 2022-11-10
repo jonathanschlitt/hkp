@@ -254,8 +254,6 @@ public class Bordcomputer {
             options.add(method.getName());
         }
 
-        options.remove("readConfig");
-        options.remove("setDevices");
         options.remove("getCurrentDevice");
 
         return options.toArray(new String[options.size()]);
