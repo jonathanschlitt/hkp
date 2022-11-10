@@ -69,7 +69,15 @@ public class Radio implements Device {
 
         // Remove all methods that are implemented via the interface
         RadioMethodNames.removeAll(superMethodNames);
+        
+        final List<String> deviceMethodNames = new ArrayList<>();
+        
+        for (final Method method : Device.class.getMethods()) {
+        	deviceMethodNames.add(method.getName());
+        }
 
+        RadioMethodNames.removeAll(deviceMethodNames);
+        
         // String s = "";
 
         // for (int i = 0; i < RadioMethodNames.size(); i++) {
@@ -86,7 +94,7 @@ public class Radio implements Device {
         // // System.out.println("Removed " + s);
         // }
         // }
-        RadioMethodNames.remove("getInfoText");
+        /*RadioMethodNames.remove("getInfoText");
         RadioMethodNames.remove("getOptions");
         RadioMethodNames.remove("chooseOption");
         RadioMethodNames.remove("louder");
@@ -94,7 +102,7 @@ public class Radio implements Device {
         RadioMethodNames.remove("getVolume");
         RadioMethodNames.remove("play");
         RadioMethodNames.remove("next");
-        RadioMethodNames.remove("prev");
+        RadioMethodNames.remove("prev");*/
 
         // for (String string : RadioMethodNames) {
         // System.out.println(string);

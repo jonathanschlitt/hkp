@@ -1,6 +1,8 @@
 package cdZulieferer;
 
 import java.lang.reflect.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import zuliefererInterface.Device;
 
@@ -76,20 +78,34 @@ public class CD implements Device {
 
   @Override
   public String[] getOptions() {
-    String[] options = null;
-    try {
-      Class thisClass = CD.class;
-      Method[] methods = thisClass.getDeclaredMethods();
-      int size = methods.length;
-      options = new String[size];
-      for (int i = 0; i < size; i++) {
-        options[i] = methods[i].getName();
-      }
-    } catch (Throwable e) {
-      System.out.println(e);
-    }
+	// Get all methods names that are implemented via the interface as List
+      final List<String> superMethodNames = new ArrayList<>();
 
-    return options;
+      // Get all methods of the super class
+      for (final Method method : this.getClass().getSuperclass().getMethods()) {
+          superMethodNames.add(method.getName());
+      }
+
+      // Get all available methods of CDPlayer as List
+      final List<String> cdPlayerMethodNames = new ArrayList<>();
+
+      // Get all methods of UsbPlayer
+      for (final Method method : this.getClass().getMethods()) {
+          cdPlayerMethodNames.add(method.getName());
+      }
+
+      // Remove all methods that are implemented via the interface
+      cdPlayerMethodNames.removeAll(superMethodNames);
+      
+      final List<String> deviceMethodNames = new ArrayList<>();
+      
+      for (final Method method : Device.class.getMethods()) {
+      	deviceMethodNames.add(method.getName());
+      }
+
+      cdPlayerMethodNames.removeAll(deviceMethodNames);
+
+      return cdPlayerMethodNames.toArray(new String[cdPlayerMethodNames.size()]);
   }
 
   @Override

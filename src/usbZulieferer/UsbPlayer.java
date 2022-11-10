@@ -60,7 +60,7 @@ public class UsbPlayer implements Device {
     }
 
     public String[] getOptions() {
-        // Get all methods names that are implemented via the interface as List
+    	// Get all methods names that are implemented via the interface as List
         final List<String> superMethodNames = new ArrayList<>();
 
         // Get all methods of the super class
@@ -78,6 +78,14 @@ public class UsbPlayer implements Device {
 
         // Remove all methods that are implemented via the interface
         usbPlayerMethodNames.removeAll(superMethodNames);
+        
+        final List<String> deviceMethodNames = new ArrayList<>();
+        
+        for (final Method method : Device.class.getMethods()) {
+        	deviceMethodNames.add(method.getName());
+        }
+
+        usbPlayerMethodNames.removeAll(deviceMethodNames);
 
         return usbPlayerMethodNames.toArray(new String[usbPlayerMethodNames.size()]);
     }
