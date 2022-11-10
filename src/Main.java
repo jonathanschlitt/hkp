@@ -1,18 +1,20 @@
 import java.util.Scanner;
 
 import fahrzeugHersteller.Bordcomputer;
+import fahrzeugHersteller.Integrator;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        final Bordcomputer bc = new Bordcomputer();
+        final Integrator ic = new Integrator();
+        final Bordcomputer bc = ic.getBordcomputer();
 
         Scanner sc = new Scanner(System.in);
 
         while (true) {
 
-            // bc.showOptions();
+            bc.showOptions();
 
             int input = 0;
 

@@ -13,121 +13,16 @@ import zuliefererInterface.Device;
 
 public class Bordcomputer {
 
-    private static final List<String> SUPPORTED_DEVICE_TYPES = Arrays.asList(new String[] {
-            "Radio",
-            "CD",
-            "USB"
-    });
-    private static final int MAX_DEVICES = 3;
-
-    // path needs to be changed to the path of the config file
-    private static final String CONFIG_FILENAME = "/fahrzeugHersteller/Geraete.config";
-
-    private String[] deviceName;
-    private Device[] installedDevices;
+    private final Device[] installedDevices;
     private Device playingDevice;
 
     // private int playingDevice;
 
-    public Bordcomputer() {
-        this.readConfig();
-        this.setDevices();
+    public Bordcomputer(final Device[] installedDevices) {
+        this.installedDevices = installedDevices;
+        this.playingDevice = this.installedDevices.length > 0 ? this.installedDevices[0] : null;
     }
 
-    private void readConfig() {
-        // Reset deviceName array
-        this.deviceName = new String[MAX_DEVICES];
-
-        // Read config file
-        try {
-            // Reset line counter
-            int lineCtr = 0;
-            
-            final File configFile = new File(getClass().getResource(CONFIG_FILENAME).getFile());
-
-            // Read file line by line
-            for (final String line : Files.readAllLines(configFile.toPath())) {
-                // If line counter exceeds size of deviceName array, break
-                if (lineCtr >= MAX_DEVICES) {
-                    System.err.println("Config file contains more than " + MAX_DEVICES + " lines. Ignoring the rest.");
-                    break;
-                }
-
-                // Split line by =
-                final String[] parts = line.split("=");
-
-                // If line does not contain exactly 2 parts, ignore it
-                if (parts.length == 2) {
-                    // Get device type
-                    final String type = parts[0].trim();
-                    // Get class name
-                    final String className = parts[1].trim();
-
-                    // Check if type and class name are valid
-                    if (className.length() > 0 && type.length() > 0) {
-                        // Check if type is supported
-                        if (SUPPORTED_DEVICE_TYPES.contains(type)) {
-                            // Add class name to deviceName array
-                            this.deviceName[lineCtr] = className;
-                            // Increment line counter
-                            lineCtr++;
-                        } else {
-                            System.err.println("Unsupported device type: " + type);
-                        }
-                    } else {
-                        System.err.println("Invalid config line: " + line);
-                    }
-                } else {
-                    System.err.println("Invalid line in config file: " + line);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void setDevices() {
-        // Reset device array
-        this.installedDevices = new Device[MAX_DEVICES];
-
-        // Reset current device
-        this.playingDevice = installedDevices[0];
-
-        // Iterate over deviceName array
-        for (int i = 0; i < this.deviceName.length; i++) {
-            // If deviceName is null, continue
-            if (this.deviceName[i] == null) {
-                continue;
-            }
-
-            // Try to create instance of device
-            try {
-                // Get class object
-                final Class<?> clazz = Class.forName(this.deviceName[i]);
-                // Create instance
-                final Object obj = clazz.getDeclaredConstructor().newInstance();
-                // Check if instance is of type Device
-                if (obj instanceof zuliefererInterface.Device) {
-                    // Add instance to device array
-                    this.installedDevices[i] = (zuliefererInterface.Device) obj;
-                } else {
-                    System.err.println("Class " + this.deviceName[i] + " is not of type Device.");
-                }
-            } catch (ClassNotFoundException e) {
-                System.err.println("Class " + this.deviceName[i] + " not found.");
-            } catch (InstantiationException e) {
-                System.err.println("Could not instantiate class " + this.deviceName[i] + ".");
-            } catch (IllegalAccessException e) {
-                System.err.println("Could not access class " + this.deviceName[i] + ".");
-            } catch (NoSuchMethodException e) {
-                System.err.println("Class " + this.deviceName[i] + " does not have a default constructor.");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        this.changeDevice();
-    }
 
     public void shutdown() {
         System.out.println("Shutting down...");
