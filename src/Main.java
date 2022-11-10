@@ -1,12 +1,20 @@
 import java.util.Scanner;
 
 import fahrzeugHersteller.Bordcomputer;
+import fahrzeugHersteller.DeviceFactory;
+import radioZulieferer.RadioFactory;
+import usbZulieferer.UsbFactory;
+import cdZulieferer.CDFactory;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        final Bordcomputer bc = new Bordcomputer();
+        final DeviceFactory radio = new RadioFactory();
+        final DeviceFactory cd = new CDFactory();
+        final DeviceFactory usb = new UsbFactory();
+
+        final Bordcomputer bc = new Bordcomputer(radio, cd, usb);
 
         Scanner sc = new Scanner(System.in);
 
