@@ -8,6 +8,7 @@ import cdZulieferer.CDFactory;
 
 public class Main {
 
+    @SuppressWarnings("all")
     public static void main(String[] args) {
 
         final DeviceFactory radio = new RadioFactory();
