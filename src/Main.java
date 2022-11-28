@@ -12,7 +12,7 @@ public class Main {
 
         while (true) {
 
-            // bc.showOptions();
+            bc.showOptions();
 
             int input = 0;
 
